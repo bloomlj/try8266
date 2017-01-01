@@ -1,9 +1,4 @@
 /*
- Basic ESP8266 MQTT example
-
- This sketch demonstrates the capabilities of the pubsub library in combination
- with the ESP8266 board/library.
-
  It connects to an MQTT server then:
   - publishes "hello world" to the topic "outTopic" every two seconds
   - subscribes to the topic "inTopic", printing out any messages
@@ -20,15 +15,20 @@
        http://arduino.esp8266.com/stable/package_esp8266com_index.json
   - Open the "Tools -> Board -> Board Manager" and click install for the ESP8266"
   - Select your ESP8266 in "Tools -> Board"
-
+Sweeps the shaft of a RC servo motor back and forth across 180 degrees. 
 */
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+#include <Servo.h> 
+Servo myservo;  // create servo object to control a servo 
+                // twelve servo objects can be created on most boards
+
 // Update these with values suitable for your network.
-const char* ssid = "TangYuan";
-const char* password = "password";
+
+const char* ssid = "maker";
+const char* password = "swjtumaker";
 const char* mqtt_server = "pitopia.cc";
 
 //15 red, 12 green ,13 blue.
@@ -43,18 +43,18 @@ char msg[50];
 int value = 0;
 
 void setup() {
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+    myservo.attach(4);  // attaches the servo on GIO2 to the servo object 
+    pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
     pinMode(redpin, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
     pinMode(greenpin, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
     pinMode(bluepin, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
-  Serial.begin(115200);
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+    Serial.begin(115200);
+    setup_wifi();
+    client.setServer(mqtt_server, 1883);
+    client.setCallback(callback);
 }
 
 void setup_wifi() {
-
   delay(10);
   // We start by connecting to a WiFi network
   Serial.println();
@@ -91,6 +91,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       digitalWrite(bluepin, LOW);    
     // but actually the LED is on; this is because
     // it is acive low on the ESP-01)
+    sweep();
   } else {
     digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
      digitalWrite(redpin, LOW);   // Turn the LED on (Note that LOW is the voltage level
@@ -120,6 +121,20 @@ void reconnect() {
     }
   }
 }
+
+void sweep(){
+  int pos;
+  for(pos = 30; pos <= 120; pos += 1) // goes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+  for(pos = 120; pos>=30; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+ }
 void loop() {
 
   if (!client.connected()) {
