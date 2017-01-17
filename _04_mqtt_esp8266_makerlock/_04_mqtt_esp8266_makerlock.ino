@@ -48,8 +48,6 @@ int value = 0;
 
 void setup() {
     //myservo.attach(4);  // attaches the servo on GIO2 to the servo object 
-    pinMode(4, OUTPUT);
-    digitalWrite(4, LOW);
     pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
     pinMode(redpin, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
     pinMode(greenpin, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
@@ -129,10 +127,11 @@ void reconnect() {
 }
 
  void openlock(){
+  pinMode(4, OUTPUT);
   myservo.attach(4);
   myservo.write(120);
   delay(2000);
-  digitalWrite(4, LOW);  
+  pinMode(4, INPUT);
  }
 void loop() {
 
