@@ -100,7 +100,8 @@ boolean check_response(String line){
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
+  pinMode(LED_BUILTIN, OUTPUT);         // Initialize the BUILTIN_LED pin as an output
+  digitalWrite(LED_BUILTIN, HIGH);      // Turn the LED off by making the voltage HIGH
 
   SPI.begin();                          // Init SPI bus
   delay(100);
@@ -138,12 +139,10 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-int value = 0;
 
 void loop() {
-  delay(5000);
-  ++value;
-
+  digitalWrite(LED_BUILTIN, HIGH);      // Turn the LED off by making the voltage HIGH
+ // delay(10);
   Serial.print("connecting to server:");
   Serial.println(host);
   
@@ -210,8 +209,10 @@ void loop() {
     Serial.print(line);
     if(check_response(line)){
       openlock();
+      digitalWrite(LED_BUILTIN, LOW);      // Turn the LED ON by making the voltage LOW
+      delay(3000);     //3 seds to open the door
+
       Serial.println("now the door should be opend");
-      
    }
   
   }
